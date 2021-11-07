@@ -9,7 +9,7 @@ window = Tk()
 window.title("Password manager")
 window.config(padx=10, pady=20, bg=YELLOW)
 
-# User Interface
+# UI
 canvas = Canvas(width=200, height=200, bg=YELLOW, highlightthickness=0)
 image = PhotoImage(file="password.png")
 canvas.create_image(100, 100, image=image)
