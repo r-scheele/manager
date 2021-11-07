@@ -1,8 +1,10 @@
+from random import choice, shuffle, randint
 from tkinter import *
+from tkinter import messagebox
+from data import letters, symbols, numbers
+import pyperclip
 
 GREEN = "#9bdeac"
-PINK = "#e2979c"
-RED = "#e7305b"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
 
@@ -11,14 +13,32 @@ window.title("Password manager")
 window.config(padx=10, pady=10, bg=YELLOW)
 
 
+# Generate password
+def generate_password():
+    password_list = [choice(letters) for _ in range(randint(8, 10))] + \
+                    [choice(symbols) for _ in range(randint(2, 4))] + \
+                    [choice(numbers) for _ in range(randint(2, 4))]
+    shuffle(password_list)
+    my_password = "".join(password_list)
+    password_form.insert(0, my_password)
+    pyperclip.copy(my_password)
+
+
 # Save data to a file
 def save_input():
     website_text, username_text, password_text = website_form.get(), username_form.get(), password_form.get()
-
-    with open("secure.txt", "a") as file:
-        file.write(f"{website_text} | {username_text} | {password_text}\n")
-        website_form.delete(0, END)
-        password_form.delete(0, END)
+    is_empty = not bool(website_text and password_text)
+    if not is_empty:
+        is_okay = messagebox.askokcancel(title=website_text,
+                                         message=f"These are the details entered: \nEmail: {username_text} "
+                                                 f"\nPassword: {password_text} \nIs it okay to save?")
+        if is_okay:
+            with open("secure.txt", "a") as file:
+                file.write(f"{website_text} | {username_text} | {password_text}\n")
+                website_form.delete(0, END)
+                password_form.delete(0, END)
+    else:
+        messagebox.showinfo(title="Oops", message="Please don't leave any of the fields empty!")
 
 
 # Get data from file
@@ -54,7 +74,7 @@ password_label.grid(column=0, row=4)
 password_form = Entry(width=41)
 password_form.grid(column=1, row=4)
 
-generate_button = Button(text="Generate Password", border=0, font=(FONT_NAME, 10))
+generate_button = Button(text="Generate Password", border=0, font=(FONT_NAME, 10), command=generate_password)
 generate_button.grid(column=2, row=4, padx=8)
 
 add_button = Button(text="Add", border=0, width=51, font=(FONT_NAME, 10), command=save_input)
